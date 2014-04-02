@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+  <head> 
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+		background: #000;
+      }
+	  canvas {
+		padding-left: 0;
+		padding-right: 0;
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
+		width: 700px;
+	  }
+    </style>
+  </head>
+  <body>
+	<div id="container"></div>
+	<script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.2.min.js"></script>
+  	<script src="leap-0.4.3.js"></script>
+    <canvas id="myCanvas" width="700" height="420"></canvas>
+	
+    <script>
+		var canvas = document.getElementById('myCanvas');
+		var context = canvas.getContext('2d');
+
+		// images
+		var bear = new Image();
+		bear.src = 'teddy_angry.png';
+
+		// messages
+		var happy = false;
+		var angryMsg = "No Leap Motion? Go away!";
+		var happyMsg = "LEAP! I love you <3";
+
+		// called when mood changes for bad to good
+		ChangeOfHeart = function () {
+			happy = true;
+			bear.src = 'teddy.png';
+		}
+
+		// LEAP MOTION CONTROLLER	
+		var controller = new Leap.Controller({
+			enableGestures: true
+		});
+		controller.on('frame', function (data) {
+			frame = data;
+
+			for (var i = 0; i < frame.gestures.length; i++) {
+				var gesture = frame.gestures[i];
+				var type = gesture.type;
+				switch (type) {
+				case "swipe":
+					ChangeOfHeart();
+					break;
+				case "screenTap":
+					ChangeOfHeart();
+					break;
+				}
+			}
+		});
+		controller.connect();
+
+		function scene() {
+			context.rect(0, 0, canvas.width, canvas.height);
+
+			// add background
+			var grd = context.createLinearGradient(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+			grd.addColorStop(0, 'purple');
+			grd.addColorStop(1, 'yellow');
+			context.fillStyle = grd;
+			context.fill();
+
+			// draw stage
+			var depth = 40;
+			context.beginPath();
+			context.rect(130, canvas.height - depth, 420, canvas.height - depth);
+			context.fillStyle = 'brown';
+			context.fill();
+
+			// teddy bear
+			context.drawImage(bear, 175, 110);
+
+			//Message
+			context.fillStyle = 'white';
+			context.font = 'bold 40pt Calibri';
+
+			if (!happy)
+				context.fillText(angryMsg, 60, 50);
+			else
+				context.fillText(happyMsg, 100, 50);
+
+		};
+
+		setInterval(function () {
+			scene();
+		}, 36); 
+    </script>
+  </body>
+</html>
